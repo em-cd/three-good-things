@@ -9,22 +9,14 @@ main =
 -- MODEL
 
 type alias Model =
-  { entries : List Entry
+  { entries : List String
   , input : String
   }
-
-type alias Entry =
-  { description : String }
 
 model : Model
 model =
   { entries = []
   , input = "" }
-
-newEntry : String -> Entry
-newEntry desc  =
-  { description = desc
-  }
 
 -- UPDATE
 
@@ -41,7 +33,7 @@ update msg model =
           if String.isEmpty model.input then
             model.entries
           else
-            model.entries ++ [ newEntry model.input ]
+            model.entries ++ [ model.input ]
       }
     UpdateField input ->
       { model | input = input }
