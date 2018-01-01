@@ -55,14 +55,12 @@ view model =
     , style [ ("background-color", "blanchedalmond") ]
     ]
     [ section
-      [ class "app"
-      ]
+      [ class "app" ]
       [ input
         [ placeholder "something good"
         , onInput UpdateField
         , onEnter Add
         ][]
-        , viewEntries model.entries 
       ]
     ]
 
@@ -77,13 +75,3 @@ onEnter msg =
   in
     on "keydown" (Json.andThen isEnter keyCode)
 
--- VIEW ENTRIES
-
-viewEntries : List Entry -> Html Msg
-viewEntries entries =
-  section
-    [ class "main" ]
-    [ ul <|
-      List.map
-        [ li [] ]
-    ]
