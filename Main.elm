@@ -44,19 +44,18 @@ update msg model =
 view : Model -> Html Msg
 view model =
   div
-    [ class "wrapper"
-    , style [ ("background-color", "blanchedalmond") ]
-    ]
+    [ class "wrapper" ]
     [ section
       [ class "app" ]
-      [ input
-        [ placeholder "something good"
+      [ h1 [] [ text "three good things" ]
+      , input
+        [ placeholder "had a nice bath"
         , value model.input
         , onInput UpdateField
         , onEnter Add
         ]
         []
-      , ul
+      , ol
         []
         ( List.map (\l -> li [] [ text l ]) model.entries )
       ]
@@ -72,4 +71,6 @@ onEnter msg =
        Json.fail "not ENTER"
   in
     on "keydown" (Json.andThen isEnter keyCode)
+
+
 
