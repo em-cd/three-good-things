@@ -54,7 +54,11 @@ view model =
         , value model.input
         , onInput UpdateField
         , onEnter Add
-        ][]
+        ]
+        []
+      , ul
+        []
+        ( List.map (\l -> li [] [ text l ]) model.entries )
       ]
     ]
 
