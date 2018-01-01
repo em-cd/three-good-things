@@ -29,7 +29,8 @@ update msg model =
   case msg of
     Add ->
       { model
-        | entries =
+        | input = ""
+        , entries =
           if String.isEmpty model.input then
             model.entries
           else
@@ -50,6 +51,7 @@ view model =
       [ class "app" ]
       [ input
         [ placeholder "something good"
+        , value model.input
         , onInput UpdateField
         , onEnter Add
         ][]
