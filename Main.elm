@@ -2,33 +2,46 @@ import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import Json.Decode as Json
+import Date exposing (..)
+import Task exposing (..)
 
 main =
-  Html.beginnerProgram { model = model, view = view, update = update }
+  Html.program
+    { init = init
+    , view = view
+    , update = update
+    , subscriptions = always Sub.none
+    }
 
 -- MODEL
 
 type alias Model =
   { entries : List String
   , input : String
+  , date : Maybe Date
   }
 
-model : Model
-model =
-  { entries = []
-  , input = "" }
+init : ( Model, Cmd Msg )
+init =
+  ( { entries = []
+    , input = ""
+    , date = Nothing
+    }
+  , Cmd.none
+  )
 
 -- UPDATE
 
 type Msg
   = UpdateField String
   | Add
+  | RequestDate
+  | ReceiveDate Date
 
-update : Msg -> Model -> Model
 update msg model =
   case msg of
     Add ->
-      { model
+      ({ model
         | input = ""
         , entries =
           if String.isEmpty model.input then
@@ -36,8 +49,22 @@ update msg model =
           else
             model.entries ++ [ model.input ]
       }
+      , Cmd.none )
     UpdateField input ->
-      { model | input = input }
+      ({ model | input = input }
+      , Cmd.none
+      )
+    
+    RequestDate ->
+      ( model, Task.perform ReceiveDate Date.now )
+
+    ReceiveDate date ->
+      let
+        nextModel =
+          { model | date = Just date }
+      in
+         ( nextModel, Cmd.none )
+
 
 -- VIEW
 
@@ -58,6 +85,9 @@ view model =
       , ol
         []
         ( List.map (\l -> li [] [ text l ]) model.entries )
+      , button
+        [ onClick RequestDate ] [ text "Request date" ]
+      , text (getFormattedDate model.date)
       ]
     ]
 
@@ -72,5 +102,10 @@ onEnter msg =
   in
     on "keydown" (Json.andThen isEnter keyCode)
 
-
-
+getFormattedDate : Maybe Date -> String
+getFormattedDate date =
+  case date of
+    Just d ->
+      toString d
+    Nothing ->
+      "No date yet."
