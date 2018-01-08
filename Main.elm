@@ -27,7 +27,7 @@ init =
     , input = ""
     , date = Nothing
     }
-  , Cmd.none
+  , fetchDate
   )
 
 -- UPDATE
@@ -35,9 +35,9 @@ init =
 type Msg
   = UpdateField String
   | Add
-  | RequestDate
   | ReceiveDate Date
 
+update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
     Add ->
@@ -50,13 +50,11 @@ update msg model =
             model.entries ++ [ model.input ]
       }
       , Cmd.none )
+
     UpdateField input ->
       ({ model | input = input }
       , Cmd.none
       )
-    
-    RequestDate ->
-      ( model, Task.perform ReceiveDate Date.now )
 
     ReceiveDate date ->
       let
@@ -75,8 +73,9 @@ view model =
     [ section
       [ class "app" ]
       [ h1 [] [ text "three good things" ]
+      , text (getFormattedDate model.date)
       , input
-        [ placeholder "had a nice bath"
+        [ placeholder "tidied my room"
         , value model.input
         , onInput UpdateField
         , onEnter Add
@@ -85,9 +84,6 @@ view model =
       , ol
         []
         ( List.map (\l -> li [] [ text l ]) model.entries )
-      , button
-        [ onClick RequestDate ] [ text "Request date" ]
-      , text (getFormattedDate model.date)
       ]
     ]
 
@@ -102,10 +98,20 @@ onEnter msg =
   in
     on "keydown" (Json.andThen isEnter keyCode)
 
+fetchDate : Cmd Msg
+fetchDate =
+  Task.perform ReceiveDate Date.now
+
 getFormattedDate : Maybe Date -> String
 getFormattedDate date =
   case date of
     Just d ->
-      toString d
+      ( toString <| Date.dayOfWeek d )
+      ++ " "
+      ++ ( toString <| Date.day d )
+      ++ " "
+      ++ ( toString <| Date.month d )
+      ++ " "
+      ++ ( toString <| Date.year d )
     Nothing ->
       "No date yet."
